@@ -1,0 +1,4 @@
+// Your SQLite database file.
+// It is created automatically when you run the backend.
+
+// This folder keeps your DB out of the main code folders.
