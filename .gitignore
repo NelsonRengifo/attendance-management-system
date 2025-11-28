@@ -1,0 +1,32 @@
+# --- PYTHON CACHE ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# --- VIRTUAL ENVIRONMENTS ---
+venv/
+env/
+ENV/
+
+# --- DATABASE FILES (SQLite etc.) ---
+*.db
+*.sqlite3
+
+# --- EDITOR / OS FILES ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- LOCAL ENV / SECRETS ---
+*.env
+.env*
+
+# --- LOG FILES ---
+*.log
+
+# --- COMPILED / BUILD FILES ---
+build/
+dist/
+*.egg-info/

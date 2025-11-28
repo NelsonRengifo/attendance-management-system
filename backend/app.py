@@ -1,16 +1,41 @@
-# The main file of your backend.
-# When you run the project, this is the file you start.
+# This code is responsible for:
 
-# What it does:
+# 1. Creating Flask app
+# 2. Registering blueprints/routes
+# 3. Loading database
+# 4. Starting server
 
-# Creates the Flask app
 
-# Loads routes
+from flask import Flask, request, jsonify
+import database
+import models
+import click
 
-# Connects to the database
 
-# Starts the server
+app = Flask(__name__)
+app.config['DATABASE'] = "attendance.db"
 
-# Defines global config/settings
 
-# Think of it as the "brainstem" that ties everything together.
+@app.route("/insert_student", methods=['POST'])
+def insert_student():
+    data = request.get_json()
+
+    student_id = data['student_id']
+    first_name = data['first_name']
+    last_name = data['last_name']
+    major = data['major']
+    email = data['email']
+
+    models.create_student(student_id, first_name, last_name, major, email)
+
+
+@app.cli.command("create_tables")
+def create_command():
+    models.create_tables()
+    click.echo("Database initialized.")
+
+
+app.teardown_appcontext(database.close_db)
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=True)

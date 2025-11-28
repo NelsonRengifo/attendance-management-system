@@ -1,7 +1,0 @@
-# A list of all Python packages the backend needs.
-
-# Flask
-# SQLAlchemy
-# Flask-Login
-
-# command: pip install -r requirements.txt
