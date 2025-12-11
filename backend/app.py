@@ -7,26 +7,22 @@
 
 
 from flask import Flask, request, jsonify
+from routes.check_routes import check
+from routes.admin_routes import auth
 import database
 import models
 import click
-
+import logging
 
 app = Flask(__name__)
 app.config['DATABASE'] = "attendance.db"
+logging.basicConfig(filename='logs.log',
+                    encoding='utf-8',
+                    level=logging.DEBUG,
+                    format='%(asctime)s | %(levelname)s | %(message)s')
 
-
-@app.route("/insert_student", methods=['POST'])
-def insert_student():
-    data = request.get_json()
-
-    student_id = data['student_id']
-    first_name = data['first_name']
-    last_name = data['last_name']
-    major = data['major']
-    email = data['email']
-
-    models.create_student(student_id, first_name, last_name, major, email)
+app.register_blueprint(auth)
+app.register_blueprint(check)
 
 
 @app.cli.command("create_tables")
