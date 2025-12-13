@@ -7,6 +7,10 @@
 
 import database
 import sqlite3
+import argon2
+import validators
+import click
+from getpass import getpass
 
 
 def create_tables() -> None:
@@ -18,6 +22,7 @@ def create_tables() -> None:
     sql = load_sql("schema")
     cursor.executescript(sql)
     connection.commit()
+    click.echo("Database initialized.")
 
 
 def load_sql(filename) -> str:
@@ -57,7 +62,7 @@ def create_tutor(tutor_id, tutor_last_name, subject_area, major) -> None:
 
 def search_user(username) -> bool:
     """
-    Checks if username valid.
+    Checks if username exists.
 
     :rtype: int (0 or 1)
     """
@@ -93,6 +98,21 @@ def search_student(student_id=None, student_last_name=None) -> bool:
     cursor = connection.cursor()
     sql = load_sql("search_student")
     cursor.execute(sql, (student_id, student_last_name))
+    result = cursor.fetchone()
+    return result[0]
+
+
+def search_super_admin() -> bool:
+    """
+    Checks if a super admin exists.
+
+    :rtype: int (0 or 1)
+    """
+
+    connection = database.get_db()
+    cursor = connection.cursor()
+    sql = load_sql("search_super_admin")
+    cursor.execute(sql)
     result = cursor.fetchone()
     return result[0]
 
@@ -158,6 +178,76 @@ def create_session_token(session_id, user_id) -> None:
     sql = load_sql("create_session_id")
     cursor.execute(sql, (session_id, user_id))
     connection.commit()
+
+
+def create_super_admin() -> None:
+    """
+    Obtains input for super admin and inserts it.
+    """
+    super_admin_exists = search_super_admin()
+    if super_admin_exists:
+        click.echo("Super admin already exists.")
+        return
+
+    username = input("username: ")
+    if not validators.is_valid_id(username):
+        click.echo("Invalid username.")
+        return
+    if search_user(username):
+        click.echo("Username already exists.")
+        return
+
+    first_name = input("first name: ")
+    last_name = input("last name: ")
+
+    # prompt and validate password.
+    MAX_ATTEMPTS = 5
+    attempts = 0
+    password = None
+
+    while attempts < MAX_ATTEMPTS:
+        plain_password = getpass("password: ")
+        confirm_password = getpass("confirm password: ")
+
+        if plain_password != confirm_password:
+            click.echo("Passwords do not match. Please try again.")
+            attempts += 1
+            continue
+
+        is_strong = validators.is_strong_password(plain_password, first_name, last_name, username)
+        if not is_strong[0]:
+            click.echo(is_strong[1])
+            attempts += 1
+            continue
+
+        password = plain_password
+        break
+
+    if password is None:
+        click.echo("Too many failed attempts. Please restart the registration process.")
+        return
+
+    email = input("email: ")
+    if not validators.is_valid_email(email):
+        click.echo("The email is not a valid email.")
+        return
+
+    phone = input("phone: ")
+    is_valid_phone = validators.is_valid_phone_number(phone)
+    if not is_valid_phone[0]:
+        click.echo(is_valid_phone[1])
+        return
+    phone = is_valid_phone[1]
+
+    password_hasher = argon2.PasswordHasher(hash_len=32)
+    password_hash = password_hasher.hash(password)
+
+    connection = database.get_db()
+    cursor = connection.cursor()
+    sql = load_sql("create_super_admin")
+    cursor.execute(sql, (username, password_hash, phone, email, first_name, last_name))
+    connection.commit()
+    click.echo("Super Admin successfully created.")
 
 
 def close_session(student_id) -> int:

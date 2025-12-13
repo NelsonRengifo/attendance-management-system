@@ -14,9 +14,4 @@ pycparser==2.23
 Werkzeug==3.1.4
 
 
-#TODO 12/7:
-# Authentication & authorization system
-# 1. code the session logic (opening a session and closing a session).
-# 2. implement loggin to backend.
-
 # https://dev.to/gyantocode/how-to-track-user-inactivity-on-your-website-and-why-it-matters-2b7h

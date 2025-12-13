@@ -16,11 +16,10 @@ def control():
 
     student_id = data.get("student_id")
 
-    if not validators.is_valid_int(student_id):
+    if not validators.is_valid_id(student_id):
         return jsonify({"status": "student id is invalid"}), 400
 
-    has_profile = models.search_student(
-        student_id=student_id, student_last_name=None)
+    has_profile = models.search_student(student_id=student_id, student_last_name=None)
 
     if has_profile:
         has_session = models.has_active_session(student_id)
@@ -45,7 +44,7 @@ def login():
     student_id = data.get("student_id")
     tutor_last_name = data.get("tutor_last_name")
 
-    if not validators.is_valid_int(student_id):
+    if not validators.is_valid_id(student_id):
         return jsonify({"status": "student id is invalid"}), 400
     if not validators.tutor_exists(tutor_last_name):
         return jsonify({"status": "tutor does not exist"}), 404
@@ -71,7 +70,7 @@ def logout():
 
     student_id = data.get("student_id")
 
-    if not validators.is_valid_int(student_id):
+    if not validators.is_valid_id(student_id):
         return jsonify({"status": "student id is invalid"}), 400
 
     if not models.has_active_session(student_id):
@@ -102,7 +101,7 @@ def insert_student():
     major = data.get("major")
     email = data.get("email")
 
-    if not validators.is_valid_int(student_id):
+    if not validators.is_valid_id(student_id):
         return jsonify({"status": "student id is invalid"}), 400
 
     if not validators.is_valid_email(email):

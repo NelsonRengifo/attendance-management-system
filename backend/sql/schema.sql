@@ -5,7 +5,7 @@
 --  FRONTEND OF TUTOR & ADMIN -- 
 --  Role	      UI Features Visible
 --  Admin	      Create tutor, view stats, manage users, reports, view students, active sessions.
---  Tutor	      View/retrieve student info, active sessions, submit sessions, checkin
+--  Tutor	      View/Retrieve student info, view active sessions, submit sessions, when they sign in, they check in.
 
  CREATE TABLE IF NOT EXISTS students (
    student_id INTEGER PRIMARY KEY, 
@@ -31,25 +31,24 @@
    tutor_first_name TEXT NOT NULL,
    subject_area TEXT NOT NULL, 
    major TEXT NOT NULL, 
-   available INTEGER NOT NULL DEFAULT 0    -- REPRESENTS IF TUTOR IS PRESENT OR NOT. 0 = NO, 1 = YES. UPDATED BY TUTOR
+   available INTEGER NOT NULL DEFAULT 0    -- REPRESENTS IF TUTOR IS PRESENT OR NOT. 0 = NO, 1 = YES. UPDATED BY TUTOR WHEN THEY CHECK IN
  );
  
 -- Table for login credentials
 CREATE TABLE IF NOT EXISTS users (
-  user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL UNIQUE,
+  user_id INTEGER PRIMARY KEY AUTOINCREMENT, 
+  username INTEGER NOT NULL UNIQUE,               -- tutor school id or admin school id
   password_hash TEXT NOT NULL,
   phone TEXT NOT NULL UNIQUE,
   email TEXT NOT NULL UNIQUE,
-  is_active INTEGER NOT NULL DEFAULT 0,   -- 0 NOT ACTIVE. UPDATE TO 1 ONCE TUTOR ACTIVATES ACCOUNT
-  role TEXT NOT NULL,                     -- ADMIN OR TUTOR
-  tutor_id INTEGER NOT NULL DEFAULT NULL  -- if role tutor, set this to the tutor id of tutors. users.tutor_id = tutors.tutor_id
-  invited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  created_at TIMESTAMP DEFAULT NULL,      -- UPDATE once Tutor accepts invite + sets password
-  FOREIGN KEY (tutor_id) REFERENCES tutors (tutor_id)
+  is_active INTEGER NOT NULL DEFAULT 0,        -- 0 NOT ACTIVE. 1 ACTIVE
+  user_role TEXT NOT NULL,                     -- ADMIN OR TUTOR OR SUPER ADMIN
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP      
 );
 
--- keep track of the token lifetime once tutor receives email
+-- keep track of the token lifetime once tutor receives email to change password
 CREATE TABLE IF NOT EXISTS invite_tokens (
   token TEXT PRIMARY KEY,
   user_id INTEGER NOT NULL,

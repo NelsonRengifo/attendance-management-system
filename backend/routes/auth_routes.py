@@ -62,3 +62,10 @@ def terminate_session():
     token = validators.get_token()
     models.close_session_id(token)
     return jsonify({"status": "session closed"}), 200
+
+# only for the super admin and admin. tutors never hit this
+
+
+@auth.route("/user/register", methods=['POST'])
+def create_account():
+    pass
